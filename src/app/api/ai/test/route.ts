@@ -5,6 +5,7 @@ import { OpenAIProvider } from '@/lib/ai/openai-provider';
 import { GeminiProvider } from '@/lib/ai/gemini-provider';
 import { AzureOpenAIProvider } from '@/lib/ai/azure-provider';
 import { createLogger } from '@/lib/logger';
+import { checkOutboundUrl } from '@/lib/ssrf-guard';
 
 const logger = createLogger('api:ai:test');
 
@@ -104,6 +105,27 @@ export async function POST(request: NextRequest) {
 
         if (!provider || !apiKey) {
             return NextResponse.json({ error: 'Missing provider or apiKey' }, { status: 400 });
+        }
+
+        // SSRF 防护：baseUrl / endpoint 由调用方提供，服务端会据此发起请求。
+        // 仅管理员可自定义地址，且必须通过内网地址过滤（见 src/lib/ssrf-guard.ts）。
+        const isAdmin = (session.user as { role?: string }).role === 'admin';
+        if (baseUrl || endpoint) {
+            if (!isAdmin) {
+                return NextResponse.json(
+                    { error: '仅管理员可指定自定义接口地址' },
+                    { status: 403 }
+                );
+            }
+            const target = baseUrl || endpoint;
+            const check = checkOutboundUrl(target);
+            if (!check.ok) {
+                logger.warn({ target, reason: check.reason }, 'Blocked outbound URL in ai/test');
+                return NextResponse.json(
+                    { error: `接口地址不被允许：${check.reason}` },
+                    { status: 400 }
+                );
+            }
         }
 
         logger.info({ provider, model, baseUrl: baseUrl || endpoint }, 'AI 连接测试开始');

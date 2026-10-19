@@ -441,7 +441,7 @@ function HomeContent() {
                 message={getProgressMessage()}
             />
 
-            <div className="container mx-auto p-4 space-y-8 pb-20">
+            <div className="container mx-auto p-4 space-y-8 pb-20 max-w-5xl md:px-6 md:py-8">
                 {/* Header Section */}
                 <div className="flex justify-between items-start gap-4">
                     <UserWelcome />
@@ -456,7 +456,7 @@ function HomeContent() {
                             onClick={() => signOut({ callbackUrl: '/login' })}
                             title={t.app?.logout || 'Logout'}
                         >
-                            <LogOut className="h-5 w-5" />
+                            <LogOut className="h-5 w-5 md:h-6 md:w-6" />
                         </Button>
                     </div>
                 </div>
@@ -470,7 +470,7 @@ function HomeContent() {
                         onClick={() => { setStep("upload"); setInputMode("image"); }}
                     >
                         <div className="flex items-center gap-2">
-                            <Upload className="h-5 w-5" />
+                            <Upload className="h-5 w-5 md:h-6 md:w-6" />
                             <span>{t.app.uploadNew}</span>
                         </div>
                     </Button>
@@ -484,7 +484,7 @@ function HomeContent() {
                                     className="w-full h-auto py-4 text-base shadow-sm hover:shadow-md transition-all border hover:border-primary/50 hover:bg-accent/50"
                                 >
                                     <div className="flex items-center gap-2">
-                                        <BookOpen className="h-5 w-5" />
+                                        <BookOpen className="h-5 w-5 md:h-6 md:w-6" />
                                         <span>{t.app.viewNotebook}</span>
                                     </div>
                                 </Button>
@@ -497,7 +497,7 @@ function HomeContent() {
                                     className="w-full h-auto py-4 text-base shadow-sm hover:shadow-md transition-all border hover:border-primary/50 hover:bg-accent/50"
                                 >
                                     <div className="flex items-center gap-2">
-                                        <Tags className="h-5 w-5" />
+                                        <Tags className="h-5 w-5 md:h-6 md:w-6" />
                                         <span>{t.app?.tags || 'Tags'}</span>
                                     </div>
                                 </Button>
@@ -510,7 +510,7 @@ function HomeContent() {
                                     className="w-full h-auto py-4 text-base shadow-sm hover:shadow-md transition-all border hover:border-primary/50 hover:bg-accent/50"
                                 >
                                     <div className="flex items-center gap-2">
-                                        <BarChart3 className="h-5 w-5" />
+                                        <BarChart3 className="h-5 w-5 md:h-6 md:w-6" />
                                         <span>{t.app?.stats || 'Stats'}</span>
                                     </div>
                                 </Button>
@@ -524,36 +524,36 @@ function HomeContent() {
                         {/* Input mode tabs */}
                         <div className="flex gap-2 border-b">
                             <button
-                                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                                className={`flex min-h-11 items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                                     inputMode === "image"
                                         ? "border-primary text-primary"
                                         : "border-transparent text-muted-foreground hover:text-foreground"
                                 }`}
                                 onClick={() => setInputMode("image")}
                             >
-                                <Upload className="h-4 w-4" />
+                                <Upload className="h-4 w-4 md:h-6 md:w-6" />
                                 {t.app?.uploadImage || "拍照上传"}
                             </button>
                             <button
-                                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                                className={`flex min-h-11 items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                                     inputMode === "text"
                                         ? "border-primary text-primary"
                                         : "border-transparent text-muted-foreground hover:text-foreground"
                                 }`}
                                 onClick={() => setInputMode("text")}
                             >
-                                <PenLine className="h-4 w-4" />
+                                <PenLine className="h-4 w-4 md:h-6 md:w-6" />
                                 {t.app?.manualInput || "AI解题"}
                             </button>
                             <button
-                                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                                className={`flex min-h-11 items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                                     inputMode === "direct"
                                         ? "border-primary text-primary"
                                         : "border-transparent text-muted-foreground hover:text-foreground"
                                 }`}
                                 onClick={() => setInputMode("direct")}
                             >
-                                <PenLine className="h-4 w-4" />
+                                <PenLine className="h-4 w-4 md:h-6 md:w-6" />
                                 直接录入
                             </button>
                         </div>

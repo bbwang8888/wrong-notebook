@@ -133,12 +133,12 @@ function PracticeContent() {
         <div className="max-w-3xl mx-auto space-y-8">
             <div className="flex justify-between items-center mb-4">
                 <Button variant="ghost" onClick={() => router.back()}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    <ArrowLeft className="mr-2 h-4 w-4 md:h-6 md:w-6" />
                     {t.common?.back || "返回"}
                 </Button>
                 <Link href="/">
                     <Button variant="ghost" size="icon">
-                        <House className="h-5 w-5" />
+                        <House className="h-5 w-5 md:h-6 md:w-6" />
                     </Button>
                 </Link>
             </div>
@@ -183,12 +183,12 @@ function PracticeContent() {
                         <Button size="lg" onClick={generateQuestion} disabled={loading}>
                             {loading ? (
                                 <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    <Loader2 className="mr-2 h-4 w-4 md:h-6 md:w-6 animate-spin" />
                                     {t.practice.generating}
                                 </>
                             ) : (
                                 <>
-                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                    <RefreshCw className="mr-2 h-4 w-4 md:h-6 md:w-6" />
                                     {t.practice.generate}
                                 </>
                             )}
@@ -223,12 +223,12 @@ function PracticeContent() {
                                     >
                                         {loading ? (
                                             <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                <Loader2 className="mr-2 h-4 w-4 md:h-6 md:w-6 animate-spin" />
                                                 {t.practice.generating}
                                             </>
                                         ) : (
                                             <>
-                                                <RefreshCw className="mr-2 h-4 w-4" />
+                                                <RefreshCw className="mr-2 h-4 w-4 md:h-6 md:w-6" />
                                                 {t.practice.regenerate}
                                             </>
                                         )}
@@ -276,7 +276,7 @@ function PracticeContent() {
                                 disabled={!userAnswer.trim()}
                                 className="w-full md:w-auto"
                             >
-                                <Send className="mr-2 h-4 w-4" />
+                                <Send className="mr-2 h-4 w-4 md:h-6 md:w-6" />
                                 {t.app.submitAnswer || "提交答案"}
                             </Button>
                         </div>

@@ -96,6 +96,7 @@ export const translations = {
             screenshotFailed: "Screenshot failed",
             screenshotPermissionDenied: "Screenshot permission denied",
             screenshotComplete: "Screenshot captured! Returning to upload page...",
+            tapToSelect: "Tap here to choose or take a photo",
         },
         editor: {
             title: "Review & Correct",
@@ -395,6 +396,8 @@ export const translations = {
                 validationApiKeyRequired: "API Key is required",
                 validationBaseUrlRequired: "Base URL is required",
                 validationModelRequired: "Model name is required",
+                disableThinking: "Disable thinking mode",
+                disableThinkingHint: "For reasoning models (e.g. DeepSeek). When thinking is on, reasoning tokens count toward max_tokens and can consume the whole budget, making the response empty. Recommended: enabled.",
                 // Azure OpenAI
                 azureEndpoint: "Azure Endpoint",
                 azureEndpointPlaceholder: "https://your-resource.openai.azure.com",
@@ -744,6 +747,7 @@ export const translations = {
             screenshotFailed: "截图失败",
             screenshotPermissionDenied: "截图权限被拒绝",
             screenshotComplete: "截图完成！正在返回上传页面...",
+            tapToSelect: "点此选择图片或拍照",
         },
         editor: {
             title: "校对与保存",
@@ -1043,6 +1047,8 @@ export const translations = {
                 validationApiKeyRequired: "API Key 不能为空",
                 validationBaseUrlRequired: "Base URL 不能为空",
                 validationModelRequired: "模型名称不能为空",
+                disableThinking: "关闭思考模式",
+                disableThinkingHint: "适用于推理模型（如 DeepSeek）。思考模式开启时，思维链 token 会计入 max_tokens，可能耗尽全部额度导致返回内容为空。建议开启本项。",
                 // Azure OpenAI
                 azureEndpoint: "Azure 端点",
                 azureEndpointPlaceholder: "https://your-resource.openai.azure.com",

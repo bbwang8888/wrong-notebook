@@ -106,9 +106,9 @@ export function ModelSelector({ provider, apiKey, baseUrl, currentModel, onModel
                     disabled={loading || !apiKey}
                 >
                     {loading ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <Loader2 className="h-3 w-3 md:h-5 md:w-5 animate-spin" />
                     ) : (
-                        <RefreshCw className="h-3 w-3" />
+                        <RefreshCw className="h-3 w-3 md:h-5 md:w-5" />
                     )}
                 </Button>
             </div>

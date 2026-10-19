@@ -70,7 +70,7 @@ function DailyTrendChart({ data, t }: { data: AdminDashboardData; t: any }) {
         <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-orange-500" />
+                    <TrendingUp className="h-4 w-4 md:h-6 md:w-6 text-orange-500" />
                     {t.admin?.dashboard?.recentTrend || "最近 7 天录入趋势"}
                 </CardTitle>
             </CardHeader>
@@ -110,7 +110,7 @@ function SubjectDistributionChart({ data, t }: { data: AdminDashboardData; t: an
         <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-blue-500" />
+                    <BarChart3 className="h-4 w-4 md:h-6 md:w-6 text-blue-500" />
                     {t.admin?.dashboard?.subjectDistribution || "学科错题分布"}
                 </CardTitle>
             </CardHeader>
@@ -157,7 +157,7 @@ function MasteryDistributionCard({ data, t }: { data: AdminDashboardData; t: any
         <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-4 w-4 md:h-6 md:w-6 text-green-500" />
                     {t.admin?.dashboard?.masteryDistribution || "掌握度分布"}
                 </CardTitle>
             </CardHeader>
@@ -174,7 +174,7 @@ function MasteryDistributionCard({ data, t }: { data: AdminDashboardData; t: any
                                 <div key={item.key} className="space-y-1">
                                     <div className="flex justify-between text-sm items-center">
                                         <span className="flex items-center gap-1.5 font-medium">
-                                            <item.icon className={`h-4 w-4 ${item.color}`} />
+                                            <item.icon className={`h-4 w-4 md:h-6 md:w-6 ${item.color}`} />
                                             {item.label}
                                         </span>
                                         <span className="text-muted-foreground">{item.count} ({pct}%)</span>
@@ -246,7 +246,7 @@ function UserTable({ users, onViewDetail }: { users: AdminUserStats[]; onViewDet
                                         onClick={() => onViewDetail(user.id)}
                                         title={t.admin?.dashboard?.viewDetail || "查看详情"}
                                     >
-                                        <Eye className="h-4 w-4" />
+                                        <Eye className="h-4 w-4 md:h-6 md:w-6" />
                                     </Button>
                                 </td>
                             </tr>
@@ -278,9 +278,9 @@ function UserTable({ users, onViewDetail }: { users: AdminUserStats[]; onViewDet
                                         {user.isActive ? (t.admin?.active || "启用") : (t.admin?.disabled || "禁用")}
                                     </Badge>
                                     {expandedId === user.id ? (
-                                        <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                                        <ChevronUp className="h-4 w-4 md:h-6 md:w-6 text-muted-foreground" />
                                     ) : (
-                                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                        <ChevronDown className="h-4 w-4 md:h-6 md:w-6 text-muted-foreground" />
                                     )}
                                 </div>
                             </div>
@@ -310,7 +310,7 @@ function UserTable({ users, onViewDetail }: { users: AdminUserStats[]; onViewDet
                                         size="sm"
                                         onClick={() => onViewDetail(user.id)}
                                     >
-                                        <Eye className="h-4 w-4 mr-1" />
+                                        <Eye className="h-4 w-4 md:h-6 md:w-6 mr-1" />
                                         {t.admin?.dashboard?.viewDetail || "查看详情"}
                                     </Button>
                                 </div>
@@ -373,7 +373,7 @@ export default function AdminPage() {
             {/* Header */}
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
-                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    <ArrowLeft className="h-4 w-4 md:h-6 md:w-6 mr-1" />
                     {t.common?.back || "返回"}
                 </Button>
                 <div>
@@ -400,7 +400,7 @@ export default function AdminPage() {
             <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <Users className="h-5 w-5 text-blue-500" />
+                        <Users className="h-5 w-5 md:h-6 md:w-6 text-blue-500" />
                         {t.admin?.dashboard?.userList || "用户列表"}
                     </CardTitle>
                     <CardDescription>

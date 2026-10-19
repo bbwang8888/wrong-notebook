@@ -9,6 +9,24 @@ import { normalizeMistakeStatusForSave } from '../mistake-status';
 
 const logger = createLogger('ai:openai');
 
+/**
+ * 已知「默认开启思考模式」的 OpenAI 兼容端点。
+ *
+ * 这些端点的思维链 token 会计入 max_tokens：当推理长度超出上限时
+ * finish_reason 返回 "length" 且 content 为空字符串，导致解析失败
+ * （详见 analyzeForGeogebra 的调用方报错 AI_UNKNOWN_ERROR / 502）。
+ * 因此对它们默认关闭思考模式；用户可在设置里用 disableThinking 覆盖。
+ */
+const THINKING_CAPABLE_HOSTS = [
+    'api.deepseek.com',
+];
+
+function isThinkingCapableEndpoint(baseUrl?: string): boolean {
+    if (!baseUrl) return false;
+    const lower = baseUrl.toLowerCase();
+    return THINKING_CAPABLE_HOSTS.some((host) => lower.includes(host));
+}
+
 type OpenAIUserContent = string | Array<
     { type: "text"; text: string } |
     { type: "image_url"; image_url: { url: string } }
@@ -20,6 +38,8 @@ export class OpenAIProvider implements AIService {
     private baseURL: string;
     private apiKey: string;
     private isLongCat: boolean;
+    private disableThinking: boolean;
+    private isThinkingCapable: boolean;
 
     constructor(config?: AIConfig) {
         const apiKey = config?.apiKey;
@@ -42,12 +62,42 @@ export class OpenAIProvider implements AIService {
         this.apiKey = apiKey;
         this.isLongCat = this.baseURL.includes('longcat.chat');
 
+        // 思考模式：显式配置优先，未配置时对已知思考型端点默认关闭
+        this.isThinkingCapable = isThinkingCapableEndpoint(this.baseURL);
+        this.disableThinking = config?.disableThinking ?? this.isThinkingCapable;
+
         logger.info({
             provider: 'OpenAI',
             model: this.model,
             baseURL: this.baseURL,
-            apiKeyPrefix: apiKey.substring(0, 8) + '...'
+            apiKeyPrefix: apiKey.substring(0, 8) + '...',
+            disableThinking: this.disableThinking,
+            thinkingCapableEndpoint: this.isThinkingCapable,
         }, 'AI Provider initialized');
+    }
+
+    /**
+     * 构造控制思考模式的请求参数。
+     *
+     * DeepSeek 等端点通过顶层 `thinking` 字段控制（OpenAI 官方无此字段，
+     * 但 SDK 会原样透传未知的顶层参数）。
+     * 关闭思考可避免思维链吃满 max_tokens 导致 content 为空。
+     */
+    private thinkingParam(): Record<string, unknown> {
+        if (!this.isThinkingCapable) return {};
+        // 用户显式关闭，或自动判定需要关闭
+        if (this.disableThinking) {
+            return { thinking: { type: 'disabled' } };
+        }
+        return { thinking: { type: 'enabled' } };
+    }
+
+    /**
+     * 合并请求参数。思考模式参数需要在运行时按配置注入，
+     * 而 OpenAI SDK 的请求类型不允许未知顶层字段，故此处统一断言。
+     */
+    private withThinking<T extends object>(params: T): T {
+        return { ...params, ...this.thinkingParam() } as T;
     }
 
     private adaptMessagesForLongCat(messages: Array<{ role: string; content: any }>): Array<{ role: string; content: any }> {
@@ -258,28 +308,30 @@ export class OpenAIProvider implements AIService {
 
                 response = await res.json();
             } else {
-                response = await this.openai.chat.completions.create({
-                    model: this.model,
-                    messages: [
-                        {
-                            role: "system",
-                            content: systemPrompt
-                        },
-                        {
-                            role: "user",
-                            content: [
-                                {
-                                    type: "image_url",
-                                    image_url: {
-                                        url: `data:${mimeType};base64,${imageBase64}`,
+                response = await this.openai.chat.completions.create(
+                    this.withThinking({
+                        model: this.model,
+                        messages: [
+                            {
+                                role: "system",
+                                content: systemPrompt
+                            },
+                            {
+                                role: "user",
+                                content: [
+                                    {
+                                        type: "image_url",
+                                        image_url: {
+                                            url: `data:${mimeType};base64,${imageBase64}`,
+                                        },
                                     },
-                                },
-                            ],
-                        },
-                    ],
-                    // response_format: { type: "json_object" }, // Removing to improve compatibility with 3rd party providers
-                    max_tokens: 8192,
-                });
+                                ],
+                            },
+                        ],
+                        // response_format: { type: "json_object" }, // Removing to improve compatibility with 3rd party providers
+                        max_tokens: 8192,
+                    }) as any
+                );
             }
 
             logger.box('📦 Full API Response', JSON.stringify(response, null, 2));
@@ -331,15 +383,17 @@ export class OpenAIProvider implements AIService {
         logger.box('📝 User Prompt', userPrompt);
 
         try {
-            const response = await this.openai.chat.completions.create({
-                model: this.model,
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: userPrompt },
-                ],
-                // response_format: { type: "json_object" }, // Removing to improve compatibility with 3rd party providers
-                max_tokens: 8192,
-            });
+            const response = await this.openai.chat.completions.create(
+                this.withThinking({
+                    model: this.model,
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: userPrompt },
+                    ],
+                    // response_format: { type: "json_object" }, // Removing to improve compatibility with 3rd party providers
+                    max_tokens: 8192,
+                }) as any
+            );
 
             const text = response.choices[0]?.message?.content || "";
 
@@ -402,14 +456,16 @@ export class OpenAIProvider implements AIService {
             };
             logger.debug({ requestParams }, 'Request parameters');
 
-            const response = await this.openai.chat.completions.create({
-                model: this.model,
-                messages: [
-                    { role: "system", content: prompt },
-                    { role: "user", content: userContent }
-                ],
-                max_tokens: 8192,
-            });
+            const response = await this.openai.chat.completions.create(
+                this.withThinking({
+                    model: this.model,
+                    messages: [
+                        { role: "system", content: prompt },
+                        { role: "user", content: userContent }
+                    ],
+                    max_tokens: 8192,
+                }) as any
+            );
 
             logger.debug({ response: JSON.stringify(response) }, 'Full API response');
 
@@ -458,14 +514,18 @@ export class OpenAIProvider implements AIService {
         }, 'GeoGebra Analysis Request');
 
         try {
-            const response = await this.openai.chat.completions.create({
-                model: this.model,
-                messages: [
-                    { role: "system", content: prompt },
-                    { role: "user", content: "请分析上述题目并生成 GeoGebra 演示命令。" }
-                ],
-                max_tokens: 4096,
-            });
+            const response = await this.openai.chat.completions.create(
+                this.withThinking({
+                    model: this.model,
+                    messages: [
+                        { role: "system", content: prompt },
+                        { role: "user", content: "请分析上述题目并生成 GeoGebra 演示命令。" }
+                    ],
+                    // 该任务需要输出较大的 JSON（多条 GeoGebra 命令），
+                    // 原先的 4096 在思考模式下会被思维链吃满并返回空内容。
+                    max_tokens: 8192,
+                }) as any
+            );
 
             const text = response.choices[0]?.message?.content || '';
             logger.debug({ rawResponse: text }, 'GeoGebra AI raw response');
