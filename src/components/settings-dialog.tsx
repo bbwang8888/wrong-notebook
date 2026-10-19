@@ -496,13 +496,12 @@ export function SettingsDialog() {
         return instances.find(i => i.id === activeId);
     };
 
-    // 与后端 THINKING_CAPABLE_HOSTS 保持一致的端点判定。
-    // 用于在 disableThinking 未显式设置时，让开关显示后端实际生效的行为。
-    const isThinkingCapableBaseUrl = (baseUrl?: string): boolean =>
-        !!baseUrl && baseUrl.toLowerCase().includes('api.deepseek.com');
-
-    const isThinkingDisabled = (instance?: OpenAIInstance): boolean =>
-        instance?.disableThinking ?? isThinkingCapableBaseUrl(instance?.baseUrl);
+    // 与后端 isThinkingCapableEndpoint 的判定保持一致：后端从环境变量
+    // THINKING_CAPABLE_HOSTS 读取端点清单（前端无法读取该变量），
+    // 因此这里不猜测，只在 disableThinking 未显式设置时返回 undefined，
+    // 由 UI 显示「跟随服务端配置」。
+    const isThinkingDisabled = (instance?: OpenAIInstance): boolean | undefined =>
+        instance?.disableThinking;
 
     // 更新当前选中的 OpenAI 实例属性（支持字符串与布尔型开关）
     const updateOpenAIInstance = (key: keyof OpenAIInstance, value: string | boolean) => {
@@ -1061,7 +1060,7 @@ export function SettingsDialog() {
                                                         </div>
                                                         <Switch
                                                             id="disable-thinking"
-                                                            checked={isThinkingDisabled(getSelectedInstance())}
+                                                            checked={isThinkingDisabled(getSelectedInstance()) ?? false}
                                                             onCheckedChange={(checked) => updateOpenAIInstance('disableThinking', checked)}
                                                         />
                                                     </div>

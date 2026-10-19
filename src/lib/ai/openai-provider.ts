@@ -10,16 +10,21 @@ import { normalizeMistakeStatusForSave } from '../mistake-status';
 const logger = createLogger('ai:openai');
 
 /**
- * 已知「默认开启思考模式」的 OpenAI 兼容端点。
+ * 「默认开启思考模式」的 OpenAI 兼容端点（可选配置）。
  *
- * 这些端点的思维链 token 会计入 max_tokens：当推理长度超出上限时
+ * 这类端点的思维链 token 会计入 max_tokens：当推理长度超出上限时
  * finish_reason 返回 "length" 且 content 为空字符串，导致解析失败
  * （详见 analyzeForGeogebra 的调用方报错 AI_UNKNOWN_ERROR / 502）。
- * 因此对它们默认关闭思考模式；用户可在设置里用 disableThinking 覆盖。
+ * 因此对它们默认关闭思考模式；用户可在设置里用 disableThinking 显式覆盖。
+ *
+ * 端点清单不再写死在代码里，而是通过环境变量 THINKING_CAPABLE_HOSTS 提供
+ * （英文逗号分隔的主机名片段，例如 "api.example.com,api.example.org"）。
+ * 未配置时为空列表，即不做自动判定 —— 此时请通过 disableThinking 显式控制。
  */
-const THINKING_CAPABLE_HOSTS = [
-    'api.deepseek.com',
-];
+const THINKING_CAPABLE_HOSTS = (process.env.THINKING_CAPABLE_HOSTS || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
 
 function isThinkingCapableEndpoint(baseUrl?: string): boolean {
     if (!baseUrl) return false;
@@ -79,7 +84,7 @@ export class OpenAIProvider implements AIService {
     /**
      * 构造控制思考模式的请求参数。
      *
-     * DeepSeek 等端点通过顶层 `thinking` 字段控制（OpenAI 官方无此字段，
+     * 部分推理型端点通过顶层 `thinking` 字段控制（OpenAI 官方接口无此字段，
      * 但 SDK 会原样透传未知的顶层参数）。
      * 关闭思考可避免思维链吃满 max_tokens 导致 content 为空。
      */

@@ -116,17 +116,23 @@ function check(name, pass, detail) {
 
   // ---------- 4. SSRF ----------
   console.log('\n【4】SSRF：自定义 baseUrl 权限与地址过滤');
-  const rUserCustom = await req(normal.jar, '/api/ai/models?provider=openai&apiKey=x&baseUrl=https://api.deepseek.com/v1');
+
+  // 测试用的外网地址与内网地址均可通过环境变量覆盖，
+  // 默认值仅为示例，不含任何真实环境信息。
+  const PUBLIC_TARGET  = process.env.PUBLIC_TARGET  || 'https://api.example.com/v1';
+  const PRIVATE_TARGET = process.env.PRIVATE_TARGET || 'https://192.168.1.100:3000';
+
+  const rUserCustom = await req(normal.jar, '/api/ai/models?provider=openai&apiKey=x&baseUrl=' + encodeURIComponent(PUBLIC_TARGET));
   check(`普通用户指定 baseUrl -> ${rUserCustom.status}`, rUserCustom.status === 403, '期望 403');
 
-  const rAdminLoopback = await req(admin.jar, '/api/ai/models?provider=openai&apiKey=x&baseUrl=http://127.0.0.1:3600');
+  const rAdminLoopback = await req(admin.jar, '/api/ai/models?provider=openai&apiKey=x&baseUrl=http://127.0.0.1:3000');
   const loopBody = await rAdminLoopback.json().catch(() => ({}));
   check(`管理员指定 127.0.0.1 -> ${rAdminLoopback.status} ${loopBody.error || ''}`, rAdminLoopback.status === 400, '期望 400');
 
-  const rAdminPrivate = await req(admin.jar, '/api/ai/models?provider=openai&apiKey=x&baseUrl=https://192.168.123.10:3000');
+  const rAdminPrivate = await req(admin.jar, '/api/ai/models?provider=openai&apiKey=x&baseUrl=' + encodeURIComponent(PRIVATE_TARGET));
   check(`管理员指定私有网段 -> ${rAdminPrivate.status}`, rAdminPrivate.status === 400, '期望 400');
 
-  const rAdminPublic = await req(admin.jar, '/api/ai/models?provider=openai&apiKey=x&baseUrl=https://api.deepseek.com/v1');
+  const rAdminPublic = await req(admin.jar, '/api/ai/models?provider=openai&apiKey=x&baseUrl=' + encodeURIComponent(PUBLIC_TARGET));
   check(`管理员指定公网域名 -> ${rAdminPublic.status}`, rAdminPublic.status === 200, '期望 200（放行）');
 
   // ---------- 5. IDOR ----------

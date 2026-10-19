@@ -83,18 +83,18 @@ describe('/api/ai/models', () => {
                 json: async () => ({
                     object: 'list',
                     data: [
-                        { id: 'deepseek-flash', owned_by: 'deepseek' },
-                        { id: 'deepseek-v4-pro', owned_by: 'deepseek' },
+                        { id: 'model-a', owned_by: 'provider-a' },
+                        { id: 'model-b', owned_by: 'provider-a' },
                     ],
                 }),
             }));
 
-            const response = await GET(makeRequest('provider=openai&apiKey=sk-x&baseUrl=https://api.deepseek.com/v1'));
+            const response = await GET(makeRequest('provider=openai&apiKey=sk-x&baseUrl=https://api.example.com/v1'));
             const data = await response.json();
 
             expect(response.status).toBe(200);
             expect(data.models).toHaveLength(2);
-            expect(data.models[0].id).toBe('deepseek-flash');
+            expect(data.models[0].id).toBe('model-a');
         });
 
         it('缺少 apiKey 时应返回 400', async () => {
@@ -118,7 +118,7 @@ describe('/api/ai/models', () => {
                 text: async () => 'nope',
             }));
 
-            const response = await GET(makeRequest('provider=openai&apiKey=sk-bad&baseUrl=https://api.deepseek.com/v1'));
+            const response = await GET(makeRequest('provider=openai&apiKey=sk-bad&baseUrl=https://api.example.com/v1'));
             const data = await response.json();
 
             expect(response.status).toBe(200);
@@ -131,7 +131,7 @@ describe('/api/ai/models', () => {
             vi.stubGlobal('fetch', fetchSpy);
 
             const response = await GET(
-                makeRequest('provider=openai&apiKey=sk-x&baseUrl=https://api.deepseek.com/v1')
+                makeRequest('provider=openai&apiKey=sk-x&baseUrl=https://api.example.com/v1')
             );
 
             expect(response.status).toBe(403);

@@ -100,7 +100,8 @@ const DEFAULT_CONFIG: AppConfig = {
             apiKey: process.env.OPENAI_API_KEY,
             baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
             model: process.env.OPENAI_MODEL || 'gpt-4o',
-            // 未显式配置时由后端按端点自动判定（DeepSeek 默认关闭思考模式）
+            // 未显式配置时由后端按端点自动判定
+            // （端点清单来自环境变量 THINKING_CAPABLE_HOSTS，为空则不做判定）
             disableThinking: process.env.OPENAI_DISABLE_THINKING
                 ? process.env.OPENAI_DISABLE_THINKING === 'true'
                 : undefined,
