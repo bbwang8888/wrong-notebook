@@ -13,6 +13,9 @@ export interface OpenAIInstance {
     apiKey: string;
     baseUrl: string;
     model: string;
+    // 关闭推理模型的思考模式；undefined 表示由后端自动判定
+    // 详见 src/types/api.ts 的说明
+    disableThinking?: boolean;
 }
 
 export interface AppConfig {
@@ -97,6 +100,10 @@ const DEFAULT_CONFIG: AppConfig = {
             apiKey: process.env.OPENAI_API_KEY,
             baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
             model: process.env.OPENAI_MODEL || 'gpt-4o',
+            // 未显式配置时由后端按端点自动判定（DeepSeek 默认关闭思考模式）
+            disableThinking: process.env.OPENAI_DISABLE_THINKING
+                ? process.env.OPENAI_DISABLE_THINKING === 'true'
+                : undefined,
         }] : [],
         activeInstanceId: process.env.OPENAI_API_KEY ? 'env-default' : undefined,
     },

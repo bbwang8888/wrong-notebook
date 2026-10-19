@@ -352,12 +352,12 @@ export default function AddErrorPage() {
                 message={getProgressMessage()}
             />
 
-            <div className="container mx-auto p-4 space-y-8 pb-20">
+            <div className="container mx-auto p-4 space-y-8 pb-20 max-w-5xl md:px-6 md:py-8">
                 {/* Header Section */}
                 <div className="flex items-center gap-4">
                     <Link href={`/notebooks/${notebookId}`}>
                         <Button variant="ghost" size="icon">
-                            <ArrowLeft className="h-5 w-5" />
+                            <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
                         </Button>
                     </Link>
                     <h1 className="text-2xl font-bold">{t.app.addError}</h1>
@@ -369,25 +369,25 @@ export default function AddErrorPage() {
                         {/* Input mode tabs */}
                         <div className="flex gap-2 border-b">
                             <button
-                                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                                className={`flex min-h-11 items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                                     inputMode === "image"
                                         ? "border-primary text-primary"
                                         : "border-transparent text-muted-foreground hover:text-foreground"
                                 }`}
                                 onClick={() => setInputMode("image")}
                             >
-                                <Upload className="h-4 w-4" />
+                                <Upload className="h-4 w-4 md:h-6 md:w-6" />
                                 {t.app?.uploadImage || "拍照上传"}
                             </button>
                             <button
-                                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                                className={`flex min-h-11 items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                                     inputMode === "text"
                                         ? "border-primary text-primary"
                                         : "border-transparent text-muted-foreground hover:text-foreground"
                                 }`}
                                 onClick={() => setInputMode("text")}
                             >
-                                <PenLine className="h-4 w-4" />
+                                <PenLine className="h-4 w-4 md:h-6 md:w-6" />
                                 {t.app?.manualInput || "手动输入"}
                             </button>
                         </div>
